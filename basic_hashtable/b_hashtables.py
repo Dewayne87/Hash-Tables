@@ -16,7 +16,7 @@ class Pair:
 class BasicHashTable:
     def __init__(self, capacity):
         self.capacity = capacity
-        self.elements = [None] * capacity
+        self.storage = [None] * capacity
 
 
 # '''
@@ -26,9 +26,8 @@ class BasicHashTable:
 def hash(string,max ):
     hash = 5381
     for x in string:
-        hash = (( hash << 5) + hash) + ord(x) 
-    hash = hash % max 
-    return hash & 0xFFFFFFFF
+        hash = (( hash << 5) + hash) + ord(x)  
+    return hash % max
 
 
 # '''
@@ -37,10 +36,11 @@ def hash(string,max ):
 # If you are overwriting a value with a different key, print a warning.
 # '''
 def hash_table_insert(hash_table, key, value):
-    hashed = hash(value,hash_table.capacity)
-    newpair = Pair(key,hashed)
-    hash_table.elements.append(newpair.value)
-
+    hashed = hash(key,hash_table.capacity)
+    newpair = Pair(hashed,value)
+    if hash_table.storage[hashed] is not None:
+        print ("Warning: overwriting " + str(hash_table.storage[hashed].key))
+    hash_table.storage[hashed] = newpair
 
 # '''
 # Fill this in.
@@ -49,8 +49,8 @@ def hash_table_insert(hash_table, key, value):
 # '''
 def hash_table_remove(hash_table, key):
     hashed = hash(key,hash_table.capacity)
-    if hash_table.elements[hashed]:
-        hash_table.elements[hashed] == None
+    if hash_table.storage[hashed] != None:
+        hash_table.storage[hashed] = None
     else:
         print("value isnt there")
 
@@ -62,11 +62,10 @@ def hash_table_remove(hash_table, key):
 # '''
 def hash_table_retrieve(hash_table, key):
     hashed = hash(key,hash_table.capacity)
-    if hash_table.elements[hashed]:
-        return hash_table.elements[hashed]
+    if hash_table.storage[hashed] != None:
+        return hash_table.storage[hashed].value
     else:
         return None
-
 
 def Testing():
     ht = BasicHashTable(16)
