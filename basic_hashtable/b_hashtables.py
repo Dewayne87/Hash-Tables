@@ -7,6 +7,7 @@ class Pair:
     def __init__(self, key, value):
         self.key = key
         self.value = value
+        self.next = None
 
 
 # '''
@@ -37,10 +38,16 @@ def hash(string,max ):
 # '''
 def hash_table_insert(hash_table, key, value):
     hashed = hash(key,hash_table.capacity)
-    newpair = Pair(hashed,value)
-    if hash_table.storage[hashed] is not None:
-        print ("Warning: overwriting " + str(hash_table.storage[hashed].key))
-    hash_table.storage[hashed] = newpair
+    newpair = Pair(key,value)
+    
+    currentPair = hash_table.storage[hashed]
+    while currentPair is not None and currentPair.key != key:
+        currentPair = currentPair.next
+    if currentPair == None:
+        newpair.next = hash_table.storage[hashed]
+        hash_table.storage[hashed] = newpair
+    else:
+        currentPair.value = value
 
 # '''
 # Fill this in.
@@ -49,8 +56,21 @@ def hash_table_insert(hash_table, key, value):
 # '''
 def hash_table_remove(hash_table, key):
     hashed = hash(key,hash_table.capacity)
-    if hash_table.storage[hashed] != None:
+    
+    if hash_table.storage[hashed] != None and hash_table.storage[hashed].next == None and hash_table.storage[hashed].key == key:
         hash_table.storage[hashed] = None
+        return
+    elif hash_table.storage[hashed] != None and hash_table.storage[hashed].next != None and hash_table.storage[hashed].key == key:
+        hash_table.storage[hashed] = hash_table.storage[hashed].next
+        return
+    
+    currentPair  = hash_table.storage[hashed]
+    while currentPair is not None and currentPair.key != key:
+        lastpair = currentPair
+        currentPair = currentPair.next
+    if currentPair.key == key and currentPair != None:
+        lastpair.next = currentPair.next
+        hash_table.storage[hashed] = lastpair
     else:
         print("value isnt there")
 
@@ -62,18 +82,26 @@ def hash_table_remove(hash_table, key):
 # '''
 def hash_table_retrieve(hash_table, key):
     hashed = hash(key,hash_table.capacity)
-    if hash_table.storage[hashed] != None:
+    currentPair = hash_table.storage[hashed]
+
+    if hash_table.storage[hashed] != None and hash_table.storage[hashed].key == key:
         return hash_table.storage[hashed].value
-    else:
+    while currentPair is not None and currentPair.key != key:
+        currentPair = currentPair.next
+    if currentPair == None:
         return None
+    elif currentPair != None and currentPair.key == key:
+        return currentPair.value
 
 def Testing():
     ht = BasicHashTable(16)
 
-    hash_table_insert(ht, "line", "Here today...\n")
-
+    hash_table_insert(ht, "a", "Here today...\n")
+    hash_table_insert(ht, "line", "Here tom...\n")
+    hash_table_insert(ht, "line", "tom...\n")
+    hash_table_insert(ht, "q", "Here tommorow...\n")
+    print(hash_table_retrieve(ht,"line"))
     hash_table_remove(ht, "line")
-
     if hash_table_retrieve(ht, "line") is None:
         print("...gone tomorrow (success!)")
     else:
