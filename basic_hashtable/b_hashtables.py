@@ -56,7 +56,7 @@ def hash_table_insert(hash_table, key, value):
 # '''
 def hash_table_remove(hash_table, key):
     hashed = hash(key,hash_table.capacity)
-    
+
     if hash_table.storage[hashed] != None and hash_table.storage[hashed].next == None and hash_table.storage[hashed].key == key:
         hash_table.storage[hashed] = None
         return
@@ -101,6 +101,9 @@ def Testing():
     hash_table_insert(ht, "line", "tom...\n")
     hash_table_insert(ht, "q", "Here tommorow...\n")
     print(hash_table_retrieve(ht,"line"))
+    print(hash_table_retrieve(ht,"a"))
+    print(hash_table_retrieve(ht,"q"))
+
     hash_table_remove(ht, "line")
     if hash_table_retrieve(ht, "line") is None:
         print("...gone tomorrow (success!)")
