@@ -7,6 +7,7 @@ class Pair:
     def __init__(self, key, value):
         self.key = key
         self.value = value
+        self.next = None
 
 
 # '''
@@ -15,15 +16,19 @@ class Pair:
 # '''
 class BasicHashTable:
     def __init__(self, capacity):
-        pass
+        self.capacity = capacity
+        self.storage = [None] * capacity
 
 
 # '''
 # Fill this in.
 # Research and implement the djb2 hash function
-# '''
-def hash(string, max):
-    pass
+# '''max)
+def hash(string,max ):
+    hash = 5381
+    for x in string:
+        hash = (( hash << 5) + hash) + ord(x)  
+    return hash % max
 
 
 # '''
@@ -32,8 +37,17 @@ def hash(string, max):
 # If you are overwriting a value with a different key, print a warning.
 # '''
 def hash_table_insert(hash_table, key, value):
-    pass
-
+    hashed = hash(key,hash_table.capacity)
+    newpair = Pair(key,value)
+    
+    currentPair = hash_table.storage[hashed]
+    while currentPair is not None and currentPair.key != key:
+        currentPair = currentPair.next
+    if currentPair == None:
+        newpair.next = hash_table.storage[hashed]
+        hash_table.storage[hashed] = newpair
+    else:
+        currentPair.value = value
 
 # '''
 # Fill this in.
@@ -41,7 +55,24 @@ def hash_table_insert(hash_table, key, value):
 # If you try to remove a value that isn't there, print a warning.
 # '''
 def hash_table_remove(hash_table, key):
-    pass
+    hashed = hash(key,hash_table.capacity)
+
+    if hash_table.storage[hashed] != None and hash_table.storage[hashed].next == None and hash_table.storage[hashed].key == key:
+        hash_table.storage[hashed] = None
+        return
+    elif hash_table.storage[hashed] != None and hash_table.storage[hashed].next != None and hash_table.storage[hashed].key == key:
+        hash_table.storage[hashed] = hash_table.storage[hashed].next
+        return
+    
+    currentPair  = hash_table.storage[hashed]
+    while currentPair is not None and currentPair.key != key:
+        lastpair = currentPair
+        currentPair = currentPair.next
+    if currentPair.key == key and currentPair != None:
+        lastpair.next = currentPair.next
+        hash_table.storage[hashed] = lastpair
+    else:
+        print("value isnt there")
 
 
 # '''
@@ -50,16 +81,30 @@ def hash_table_remove(hash_table, key):
 # Should return None if the key is not found.
 # '''
 def hash_table_retrieve(hash_table, key):
-    pass
+    hashed = hash(key,hash_table.capacity)
+    currentPair = hash_table.storage[hashed]
 
+    if hash_table.storage[hashed] != None and hash_table.storage[hashed].key == key:
+        return hash_table.storage[hashed].value
+    while currentPair is not None and currentPair.key != key:
+        currentPair = currentPair.next
+    if currentPair == None:
+        return None
+    elif currentPair != None and currentPair.key == key:
+        return currentPair.value
 
 def Testing():
     ht = BasicHashTable(16)
 
-    hash_table_insert(ht, "line", "Here today...\n")
+    hash_table_insert(ht, "a", "Here today...\n")
+    hash_table_insert(ht, "line", "Here tom...\n")
+    hash_table_insert(ht, "line", "tom...\n")
+    hash_table_insert(ht, "q", "Here tommorow...\n")
+    print(hash_table_retrieve(ht,"line"))
+    print(hash_table_retrieve(ht,"a"))
+    print(hash_table_retrieve(ht,"q"))
 
     hash_table_remove(ht, "line")
-
     if hash_table_retrieve(ht, "line") is None:
         print("...gone tomorrow (success!)")
     else:
